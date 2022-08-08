@@ -28,7 +28,7 @@ Build is not available yet. I'm currently working on updating the build file.
 
 ~~Download the .zst file from the releases section and run `sudo pacman -U ./python3-fildem*.zst`~~   
 Build is not available yet. I'm currently working on updating the build file.    
-You can a working package with `makepkg -si`
+You can build a working package with `makepkg -si`
 
 ### Building from source
 

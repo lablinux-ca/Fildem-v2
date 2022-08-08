@@ -1,51 +1,30 @@
-# Fildem V2
+# Fildem
 
-## A Global menu extension for Gnome
+## Global menu for Gnome
 
 [![Buy Me A Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg)](https://buymeacoffee.com/gonza)
 
 ![Fildem](https://user-images.githubusercontent.com/19943481/95288612-1d272a80-083f-11eb-9400-be88f61e054d.png)
 
-This project is a fork of Fildem V1. Due to the original creator abandoning the project, I've decided to keep this project upto-date.
-View current plans and ideas at https://github.com/Weather-OS/Fildem-v2/discussions.
+This project is a fork of gnomehud with the adition of a global menu bar. It’s consist of a Gnome Shell extension and a external program, you must install both for the application to work.
 
 You can also bring a HUD menu with Alt + Space (on Xorg).
+
+This is a prototype, as I don’t know if people will like or how much it will last until devs nuke it, so fell free to let me know your opinion.
 
 ## Installation
 
 ### Extension
 
-~~To install the extension, download it from the [Gnome extensions website](https://extensions.gnome.org/extension/4114/fildem-global-menu/).~~   
-Deprecated extension. Will be updated soon.   
-You can install the extension by moving `fildemGMenu@gonza.com` to `~/.local/share/gnome-shell/extensions/`
+To install the extension, download it from the [Gnome extensions website](https://extensions.gnome.org/extension/4114/fildem-global-menu/).
 
 ### Ubuntu
 
-~~Download the .deb file from the releases section and run `sudo apt install ./fildem_*.deb`~~   
-Build is not available yet. I'm currently working on updating the build file.   
+Download the .deb file from the releases section and run `sudo apt install ./fildem_*.deb`
 
 ### Arch
 
-~~Download the .zst file from the releases section and run `sudo pacman -U ./python3-fildem*.zst`~~   
-Build is not available yet. I'm currently working on updating the build file.    
-You can build a working package with `makepkg -si`
-
-### Building from source
-
-#### Dependencies
-  Arch: `bamf appmenu-gtk-module libkeybinder3 libdbusmenu-gtk2 libdbusmenu-gtk3 libdbusmenu-qt5`   
-  Ubuntu `libbamf3-dev bamfdaemon libkeybinder-3.0-dev appmenu-gtk2-module appmenu-gtk3-module unity-gtk-module-common`   
-
-Install the extension by moving `fildemGMenu@gonza.com` to `~/.local/share/gnome-shell/extensions/`.   
-
-Run `setup.py install --optimize=1`.
-
-You will be asked if you want to run fildem at startup, This is completely optional, but it is recommended.
-
-Log out and log back in.   
-Enable fildem from GNOME Extensions.    
-*If you haven't configured fildem to run at startup, you may need to run fildem and fildem-hud*   
-
+Download the .zst file from the releases section and run `sudo pacman -U ./python3-fildem*.zst`
 
 ## Configuration
 
@@ -99,3 +78,7 @@ Since it’s not possible to creat a shortcut from the app on Wayland, you have 
 ## State of the Apps
 
 To see a list of apps that work check [the wiki](https://github.com/gonzaarcr/Fildem/wiki/Using#state-of-the-apps)
+
+## Installation troubleshooting
+
+If you have any question on to get it to work, please don’t create an issue, use [this discussion](https://github.com/gonzaarcr/Fildem/discussions/33).

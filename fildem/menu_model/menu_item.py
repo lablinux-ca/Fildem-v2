@@ -21,6 +21,9 @@ class DbusGtkMenuItem(object):
 		self.enabled = enabled
 		self.toggle_type = ''
 		self.toggle_state = False
+		#if (self.action == "win.new-terminal"):
+		#	dbusopt = DbusOption(":1.184", "/org/gnome/Terminal/menus/menubar")
+
 		# :submenu
 		# two index that indicate the group
 		# dbus.String(':submenu'): dbus.Struct((dbus.UInt32(11), dbus.UInt32(0))
@@ -38,6 +41,9 @@ class DbusGtkMenuItem(object):
 			self.toggle_type = 'radio'
 			self.toggle_state = len(toggle) > 0
 
+class DbusOption(object):
+	def __init__(self, path, object_path):
+		print(dbus.SystemBus().get_object(path, object_path), False)
 
 class DbusAppMenuItem(object):
 

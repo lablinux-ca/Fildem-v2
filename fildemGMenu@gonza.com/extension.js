@@ -15,6 +15,15 @@ const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const WindowMenu = imports.ui.windowMenu;
 
+//A bug with Dbus
+function FixBrokenDbusString(arrstr) {
+	let str = "";
+	for (let substr of arrstr) {
+		str = str + substr;
+	}
+	return str;
+}
+
 //Allow for GTK3 Deprecated calls for
 //GNOME 42 Compatibility
 
@@ -25,6 +34,20 @@ function log(msg) {
 	const debug = true;
 	if (debug)
 		global.log('[FILDEM_MENU] ' + msg);
+}
+
+const CircularObjectValue = () => {
+	const seen = new WeakSet();
+	return (key, value) => {
+		if (typeof value === "object" && value !== null){
+			if (seen.has(value)) {
+				return;
+			}
+
+			seen.add(value);
+		}
+		return value;
+	}
 }
 
 
@@ -228,6 +251,11 @@ class MenuButton extends PanelMenu.Button {
 		this.connect('button-release-event', this.onButtonEvent.bind(this));
 	}
 
+	//Add individual options:
+	_addOptions() {
+		
+	}
+
 	_onStyleChanged(actor) {
 		super._onStyleChanged(actor);
 		let padding = this._menuBar.extension.settings.get_int('min-padding');
@@ -351,6 +379,7 @@ const MenuBar = class MenuBar {
 	setMenus(menus) {
 		// The expansion/shrink can be annoying, so we only do it
 		// when there’s no menus
+		log(`FILDEM: Circular menu ${JSON.stringify(menus, CircularObjectValue())}`);
 		if (menus.length === 0) {
 			this._hideMenu();
 		}
@@ -387,11 +416,13 @@ const MenuBar = class MenuBar {
 				this._appMenuButton = firstChild;
 				let label = firstChild._label;
 
+				log(`APP MENU BUTTON: ${JSON.stringify(label, CircularObjectValue())}`);
+
 				if (!this._showAppMenuButton) {
 					label.hide();
 				}
 				this._width_offset = width + el.width;
-				// break;
+				//break;
 			}
 			if (el.is_visible()) {
 				width += el.get_width();
@@ -539,6 +570,13 @@ const ifaceXml = `
 	  <arg name="on" type="b"/>
 	</signal>
 
+	<method name="SendTopLevelOptions">
+	  <arg name="top_level_options" type="as" direction="in"/>
+	</method>
+	<signal name="SendTopLevelOptionsSignal">
+	  <arg name="top_level_options" type="as"/>
+	</signal>
+
 	<method name="SendTopLevelMenus">
 	  <arg name="top_level_menus" type="as" direction="in"/>
 	</method>
@@ -546,6 +584,14 @@ const ifaceXml = `
 	  <arg name="top_level_menus" type="as"/>
 	</signal>
 
+	
+
+	<method name="RequestAction">
+	  <arg name="action" type="ab" direction="out"/>
+	</method>
+	<signal name="RequestActionSignal">
+	  <arg name="action" type="ab"/>
+	</signal>
 
 	<method name="RequestWindowActions"/>
 	<signal name="RequestWindowActionsSignal"/>
@@ -595,12 +641,15 @@ class MyProxy {
 		let id = undefined;
 		id = this._proxy.connectSignal('SendTopLevelMenus', this._onSendTopLevelMenus.bind(this));
 		this._handlerIds.push(id);
+		id = this._proxy.connectSignal('SendTopLevelOptions', this._onSendTopLevelOptions.bind(this));
+		this._handlerIds.push(id);
 		id = this._proxy.connectSignal('RequestWindowActionsSignal', this._onRequestWindowActionsSignal.bind(this));
 		this._handlerIds.push(id);
 		id = this._proxy.connectSignal('ActivateWindowActionSignal', this._onActivateWindowActionSignal.bind(this));
 		this._handlerIds.push(id);
 		id = this._proxy.connectSignal('MenuOnOff', this._onMenuOnOff.bind(this));
 		this._handlerIds.push(id);
+		
 	}
 
 	async _onMenuActivated(proxy, nameOwner, args) {
@@ -610,8 +659,14 @@ class MyProxy {
 	async _onSendTopLevelMenus(proxy, nameOwner, args) {
 		let topLevelMenus = args[0];
 		for (let callback of this.listeners['SendTopLevelMenus']) {
+			global.WindowMenuOptions = args[0];
 			callback(topLevelMenus);
 		}
+	}
+
+	async _onSendTopLevelOptions(proxy, nameOwner, args) {
+		let topLevelOptions = FixBrokenDbusString(args[0]);
+		log(`FILDEM: The received options were: ${JSON.stringify(topLevelOptions, CircularObjectValue())}`);
 	}
 
 	async _onRequestWindowActionsSignal(proxy, nameOwner, args) {
@@ -657,6 +712,7 @@ class Extension {
 		this._handlerIds = [];
 		this.myProxy = new MyProxy();
 		this.menubar = new MenuBar(this.myProxy, this);
+		log(`Menu bar is ${JSON.stringify(this.menubar, CircularObjectValue())}`);
 
 		this._connectSettings();
 	}

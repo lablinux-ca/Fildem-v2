@@ -12,6 +12,7 @@ class DbusGtkMenu(object):
 		self.actions      = {}
 		self.accels       = {}
 		self.items        = []
+		self.item_actions = []
 		self.session      = session
 		self.bus_name     = window.get_utf8_prop('_GTK_UNIQUE_BUS_NAME')
 		# with app. prefix
@@ -22,10 +23,21 @@ class DbusGtkMenu(object):
 		self.menubar_path = window.get_utf8_prop('_GTK_MENUBAR_OBJECT_PATH')
 		self.appmenu_path = window.get_utf8_prop('_GTK_APP_MENU_OBJECT_PATH')
 
+
 		self.top_level_menus = []
+		self.top_level_actions = []
+
+		dbus.SessionBus().add_signal_receiver(
+			self.activate,
+			signal_name = "RequestActionSignal",
+			dbus_interface = None,
+			bus_name = 'com.gonzaarcr.appmenu',
+			path = '/com/gonzaarcr/appmenu'
+		)
 
 	def activate(self, selection):
 		action = self.actions.get(selection, '')
+		print(action)
 
 		if 'app.' in action:
 			self.send_action(action, 'app.', self.app_path)
@@ -35,17 +47,17 @@ class DbusGtkMenu(object):
 			self.send_action(action, 'unity.', self.menubar_path)
 
 	def send_action(self, name, prefix, path):
+		print(name)
 		object    = self.session.get_object(self.bus_name, path)
 		interface = dbus.Interface(object, dbus_interface='org.gtk.Actions')
-
 		interface.Activate(name.replace(prefix, ''), [], dict())
-
+		
 	def get_results(self):
 		paths = [self.appmenu_path, self.menubar_path]
-
 		for path in filter(None, paths):
 			object    = self.session.get_object(self.bus_name, path)
 			interface = dbus.Interface(object, dbus_interface='org.gtk.Menus')
+			self.reInterface = interface
 			try:
 				results   = interface.Start([x for x in range(1024)])
 				interface.End([x for x in range(1024)])
@@ -64,8 +76,9 @@ class DbusGtkMenu(object):
 				if len(labels) == 0:
 					self.top_level_menus.append(menu.get('label', None))
 
-				menu_item = DbusGtkMenuItem(menu, labels)
+				menu_item = DbusGtkMenuItem(menu, labels, self.reInterface)
 				menu_item.section = section
+				
 				description = self.describe(menu_item.action)
 				if description is not None:
 					menu_item.enabled = description[0]
@@ -77,6 +90,7 @@ class DbusGtkMenu(object):
 					self.collect_entries(menu[':submenu'], menu_path)
 				elif 'action' in menu:
 					self.actions[menu_item.text] = menu_item.action
+					self.top_level_actions.append(menu_item.text)
 					self.items.append(menu_item)
 
 			elif ':section' in menu:
@@ -127,6 +141,7 @@ class DbusAppMenu(object):
 		self.window    = window
 		self.interface = self.get_interface()
 		self.top_level_menus = []
+		self.top_level_actions = []
 		self.results = None
 
 	def activate(self, selection):
@@ -201,4 +216,5 @@ class DbusAppMenu(object):
 
 		elif bool(menu_item.label) or menu_item.separator:
 			self.actions[menu_item.text] = menu_item.action
+			self.top_level_actions.append(menu_item.text)
 			self.items.append(menu_item)

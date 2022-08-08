@@ -128,6 +128,14 @@ class DbusMenu:
 		else:
 			top_level_menus = self.appmenu.top_level_menus
 
+		
+
+		if len(self.gtkmenu.top_level_actions):
+			top_level_actions = self.gtkmenu.top_level_actions
+		else:
+			top_level_actions = self.appmenu.top_level_actions
+
+		self._send_options_msg(top_level_actions)
 		self._handle_shortcuts(top_level_menus)
 		self._send_msg(top_level_menus)
 
@@ -136,6 +144,20 @@ class DbusMenu:
 			top_level_menus = dbus.Array(signature="s")
 		proxy  = self.session.get_object(MyService.BUS_NAME, MyService.BUS_PATH)
 		proxy.EchoSendTopLevelMenus(top_level_menus)
+
+	def _send_options_msg(self, top_level_options):
+		if len(top_level_options) == 0:
+			top_level_options = dbus.Array(signature = "s")
+		proxy = self.session.get_object(MyService.BUS_NAME, MyService.BUS_PATH)
+		TopParsedLevelOptions = [top_level_options]
+		proxy.EchoSendTopLevelOptions(str(top_level_options))
+
+	def _request_action(self, action):
+		RequestedGTKAction = self.gtkmenu.actions.get(action, '')
+		RequestedAPPAction = self.appmenu.actions.get(action, '')
+		if (RequestedGTKAction):
+			proxy = self.session.get_object(MyService.BUS_NAME, MyService.BUS_PATH)
+			proxy.ReceiveAction(action)
 
 	@property
 	def prompt(self):

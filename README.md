@@ -99,7 +99,3 @@ Since it’s not possible to creat a shortcut from the app on Wayland, you have 
 ## State of the Apps
 
 To see a list of apps that work check [the wiki](https://github.com/gonzaarcr/Fildem/wiki/Using#state-of-the-apps)
-
-## Installation troubleshooting
-
-If you have any question on to get it to work, please don’t create an issue, use [this discussion](https://github.com/gonzaarcr/Fildem/discussions/33).

@@ -34,7 +34,7 @@ You can build a working package with `makepkg -si`
 
 #### Dependencies
   Arch: `bamf appmenu-gtk-module libkeybinder3 libdbusmenu-gtk2 libdbusmenu-gtk3 libdbusmenu-qt5`   
-  Ubuntu `bamf appmenu-gtk-module libkeybinder libdbusmenu-gtk-dev libdbusmenu-qt-dev`   
+  Ubuntu `libbamf3-dev bamfdaemon libkeybinder-3.0-dev appmenu-gtk2-module appmenu-gtk3-module unity-gtk-module-common`   
 
 Install the extension by moving `fildemGMenu@gonza.com` to `~/.local/share/gnome-shell/extensions/`.   
 
